@@ -6,7 +6,7 @@
     <title>Textnummermodifierare</title>
 </head>
 <body>
-    <h1>Textnummermodifierare!</h1>
+    <h1>Textnummermodifierare</h1>
 
     <input type="file" id="fileInput" />
     <button onclick="processFile()">Bearbeta fil</button>
@@ -36,27 +36,59 @@
 
         function modifyText(text) {
             let lines = text.split('\n');
-            let currentNumber = 1; // Starta numreringen från 1
+            let currentNumber = 1;  // Starta numreringen från 1
+            let sectionStartNumber = 1; // För att hålla reda på var sektionerna börjar
+            let sectionNumber = 0;  // För att hålla reda på när en ny sektion börjar
+            let lastRowNumbers = []; // För att hålla reda på numren för de senaste raderna
 
-            // Gå igenom alla rader i filen
             for (let i = 0; i < lines.length; i++) {
-                // Kolla om raden innehåller 'SeatAdd'
+                // Kontrollera om raden är en SeatAdd och inte en RowAdd
                 if (lines[i].includes('SeatAdd') && !lines[i].includes('RowAdd')) {
-                    // Här matchar vi Name för att byta ut numret
                     const match = lines[i].match(/Name=(\d+)/);
                     if (match) {
                         let name = parseInt(match[1]);
 
-                        // Byt ut numret för varje "SeatAdd" rad med det aktuella numret
-                        lines[i] = lines[i].replace(/Name=\d+/, `Name=${currentNumber}`);
+                        // Första sektionen, 1-4 lämnas som de är
+                        if (sectionNumber === 0) {
+                            if (currentNumber <= 4) {
+                                name = currentNumber; // Behåll numreringen som den är
+                            } else if (currentNumber >= 5 && currentNumber <= 8) {
+                                name = 29 + (currentNumber - 5); // Raderna 5-8 får numrering 29-32
+                            }
+                        }
+                        // För efterföljande sektioner
+                        else {
+                            if (currentNumber <= 4) {
+                                name = sectionStartNumber + (currentNumber - 1); // Första 4 raderna får numrering från förra sektionen
+                            } else if (currentNumber >= 5 && currentNumber <= 8) {
+                                name = lastRowNumbers[4] + (currentNumber - 5); // För raderna 5-8, fortsätt numreringen från 5-8 i föregående sektion
+                            }
+                        }
+
+                        // Ersätt det gamla namnet med det nya
+                        lines[i] = lines[i].replace(/Name=\d+/, `Name=${name}`);
                         
-                        // Öka räknaren för nästa rad
+                        // Lägg till numret för raden till lastRowNumbers för att hålla reda på raderna för varje sektion
+                        lastRowNumbers.push(name);
+
+                        // Om vi har gått igenom 8 rader, börjar en ny sektion
+                        if (currentNumber === 8) {
+                            sectionNumber++;
+                            sectionStartNumber = lastRowNumbers[0] + 4; // Startnumret för nästa sektion (fortsätter från 5-8 i föregående sektion)
+                        }
+
+                        // Öka räknaren
                         currentNumber++;
                     }
                 }
+
+                // Kolla på RowAdd för att hålla koll på sektioner
+                if (lines[i].includes('RowAdd')) {
+                    sectionNumber++;
+                    currentNumber = 1; // Nollställ räknaren vid ny sektion
+                }
             }
 
-            // Slå ihop raderna tillbaka till en textsträng
             return lines.join('\n');
         }
     </script>
