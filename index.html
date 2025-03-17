@@ -6,7 +6,7 @@
     <title>Textnummermodifierare</title>
 </head>
 <body>
-    <h1>Textnummermodifierare!</h1>
+    <h1>Textnummermodifierare</h1>
 
     <input type="file" id="fileInput" />
     <button onclick="processFile()">Bearbeta fil</button>
@@ -37,8 +37,8 @@
         function modifyText(text) {
             let lines = text.split('\n');
             let currentNumber = 1;  // Starta numreringen från 1
-            let lastRowNumber = 4;  // Första sektionen slutar på 4
             let sectionNumber = 0;  // För att hålla reda på vilken sektion vi är i
+            let lastRowNumber = 4;  // Första sektionen slutar på 4
 
             for (let i = 0; i < lines.length; i++) {
                 // Kontrollera om raden är en SeatAdd och inte en RowAdd
@@ -47,15 +47,15 @@
                     if (match) {
                         let name = parseInt(match[1]);
 
-                        // Första sektionen, 1-4 lämnas som de är
+                        // Första sektionen
                         if (sectionNumber === 0) {
                             if (currentNumber <= 4) {
-                                name = currentNumber; // Behåll numreringen som den är
+                                name = currentNumber; // Behåll numreringen 1-4
                             } else if (currentNumber >= 5 && currentNumber <= 8) {
-                                name = 29 + (currentNumber - 5); // Raderna 5-8 får numrering 29-32
+                                name = 29 + (currentNumber - 5); // Raderna 5-8 döps om till 29-32
                             }
                         }
-                        // För andra sektionen och framåt
+                        // För andra sektionen och vidare
                         else {
                             if (currentNumber <= 4) {
                                 name = lastRowNumber + 1; // Första 4 raderna fortsätter från raden efter föregående sektion
@@ -70,7 +70,7 @@
                         // Uppdatera det senaste numret
                         lastRowNumber = name;
 
-                        // Öka räknaren
+                        // Öka räknaren för nästa rad
                         currentNumber++;
                     }
                 }
