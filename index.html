@@ -36,36 +36,27 @@
 
         function modifyText(text) {
             let lines = text.split('\n');
-            let counter = 1;
+            let currentNumber = 1; // Starta numreringen från 1
 
+            // Gå igenom alla rader i filen
             for (let i = 0; i < lines.length; i++) {
-                // Kontrollera om raden är en SeatAdd
+                // Kolla om raden innehåller 'SeatAdd'
                 if (lines[i].includes('SeatAdd') && !lines[i].includes('RowAdd')) {
-                    // Hitta "Name=" och ändra numret
+                    // Här matchar vi Name för att byta ut numret
                     const match = lines[i].match(/Name=(\d+)/);
                     if (match) {
                         let name = parseInt(match[1]);
 
-                        // Justera numreringen baserat på tidigare regler
-                        if (counter <= 4) {
-                            // Lämna de första fyra raderna som de är
-                            counter++;
-                        } else if (counter <= 8) {
-                            // Öka numret med 24 för rader 5 till 8
-                            name += 24;
-                            counter++;
-                        } else {
-                            // Fortsätt numreringen för rader 9 och framåt
-                            name = counter + 24;
-                            counter++;
-                        }
-
-                        // Ersätt det gamla namnet med det nya
-                        lines[i] = lines[i].replace(/Name=\d+/, `Name=${name}`);
+                        // Byt ut numret för varje "SeatAdd" rad med det aktuella numret
+                        lines[i] = lines[i].replace(/Name=\d+/, `Name=${currentNumber}`);
+                        
+                        // Öka räknaren för nästa rad
+                        currentNumber++;
                     }
                 }
             }
 
+            // Slå ihop raderna tillbaka till en textsträng
             return lines.join('\n');
         }
     </script>
